@@ -9,12 +9,15 @@ WORKDIR /app
 # Create a non-privileged system user
 RUN useradd -m -u 10001 appuser
 
+# Install security patches and system updates
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy installed python dependencies from builder
 COPY --from=builder /install /usr/local
 COPY main.py .
-
-# Update system packages to patch known high/critical CVEs in the base image
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 USER appuser
 EXPOSE 8000
